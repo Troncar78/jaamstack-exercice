@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "strapi-plugin-transformer": "^3.1.2",
+    "strapi-provider-upload-supabase": "^1.0.0"
+  },
+  "scripts": {
+    "dev": "webpack --config=Scripts/config/webpack.dev.js --watch",
+    "build": "webpack --config=Scripts/config/webpack.prod.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

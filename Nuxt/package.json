@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@nuxt/ui": "^2.14.2",
+    "@nuxtjs/strapi": "^1.11.0"
+  }
+}
