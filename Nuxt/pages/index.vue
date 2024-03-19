@@ -1,7 +1,5 @@
-<script setup lang="ts">
+<script setup lang="js">
 import { ref, computed, watch } from 'vue';
-import type { Player, PlayersResponse } from '~/models/player.model';
-import type { Competition, CompetitionsResponse } from '~/models/competition.model';
 
 const { find } = useStrapi();
 const selectedNationality = ref('');
@@ -16,7 +14,7 @@ watch(sortDirection, () => {
 });
 
 const playersQueryParams = computed(() => ({
-    populate: '*',
+  populate: '*',
     pagination: {
         page: page.value,
         pageSize: pageSize.value
@@ -28,8 +26,10 @@ const playersQueryParams = computed(() => ({
                 $in: selectedCompetition.value !== '' ? selectedCompetition.value : []
             }
         },
-        nationalite: {
-            $in: selectedNationality.value !== '' ? selectedNationality.value : []
+        nationalites: {
+            name: {
+                $in: selectedNationality.value !== '' ? selectedNationality.value : []
+            }
         }
     }
     // Vous pouvez inclure l'ordre de tri dans les paramètres si votre API le supporte
@@ -37,11 +37,27 @@ const playersQueryParams = computed(() => ({
 
 const { data: playersData, pending: playersPending, error: playersError} = useAsyncData(
     'players',
-    () => find<PlayersResponse>('players', playersQueryParams.value),
+    () => find('players', playersQueryParams.value),
     {
         watch: [page, pageSize, selectedCompetition, selectedNationality, sortDirection]
     }
 );
+const { data: competitionsData, pending: competitionsPending, error: competitionsError} = useAsyncData(
+    'competitions',
+    () => find('competitions'),
+    {
+      watch: [selectedCompetition]
+    }
+);
+const { data: nationalitesData, pending: nationalitesPending, error: nationalitesError} = useAsyncData(
+    'nationalites',
+    () => find('nationalites'),
+    {
+      watch: [selectedNationality]
+    }
+);
+
+
 
 
 // Computed property pour les joueurs filtrés et triés
@@ -50,9 +66,10 @@ const sortedFilteredPlayers = computed(() => {
         return [];
     }
 
-    let players = playersData.value.data.filter((player: Player) => {
-        const matchesNationality = player.nationalite === selectedNationality.value || selectedNationality.value === '';
+    let players = playersData.value.data.filter((player) => {
+        const matchesNationality = player.nationalites.some(nationalite => nationalite.name === selectedNationality.value) || selectedNationality.value === '';
         const matchesCompetition = player.competitions.some(competition => competition.name === selectedCompetition.value) || selectedCompetition.value === '';
+        console.log(matchesNationality)
         return matchesNationality && matchesCompetition;
     });
 
@@ -68,19 +85,17 @@ const sortedFilteredPlayers = computed(() => {
 
 <template>
     <div class="container">
-        <h1>Liste des Joueurs</h1>
         <!-- Debbuging -->
         <!-- <pre>{{ playersData }}</pre> -->
         <!-- <pre>{{ competitionsData }}</pre> -->
-        <div class="filters">
+        <div class="filters  justify-center">
             <!-- Nationality Filter -->
             <div class="filter">
                 <label for="country-select">Nationalité :</label>
                 <select name="country" id="country-select" v-model="selectedNationality">
-                    <option value="">--Please choose an option--</option>
-                    <option value="France">France</option>
-                    <option value="Chine">Chine</option>
-                    <option value="Japon">Japon</option>
+                    <option value="">Toutes nationalités</option>
+                    <option v-for="nationalite in nationalitesData?.data" :key="nationalite.id"
+                          :value="nationalite.name">{{ nationalite.name }}</option>
                 </select>
             </div>
 
@@ -88,7 +103,7 @@ const sortedFilteredPlayers = computed(() => {
             <div class="filter">
                 <label for="competitions-select">Compétitions :</label>
                 <select name="competition" id="competitions-select" v-model="selectedCompetition">
-                    <option value="">--Please choose an option--</option>
+                    <option value="">Toutes compétitions</option>
                     <option v-for="competition in competitionsData?.data" :key="competition.id"
                         :value="competition.name">{{ competition.name }}</option>
                 </select>
@@ -104,11 +119,11 @@ const sortedFilteredPlayers = computed(() => {
             </div>
         </div>
 
-        <section v-if="playersPending || competitionsPending">
+        <section v-if="playersPending || competitionsPending || nationalitesPending">
             <span>Loading...</span>
         </section>
 
-        <section v-else-if="playersError || competitionsError">
+        <section v-else-if="playersError || competitionsError || nationalitesError">
             <span>Error: {{ playersError || competitionsError }}</span>
         </section>
 
@@ -124,17 +139,17 @@ const sortedFilteredPlayers = computed(() => {
                             </a>
                         </h2>
                         <p class="player-ranking">Classement: #{{ player.ranking }}</p>
+                        <p class="player-ranking">Nationalité: {{ player.nationalites.map(nationalite => nationalite.name).join(', ') }}</p>
                     </div>
                 </div>
-                <UPagination  v-if="playersData?.meta" v-model="page" :page-count="playersData?.meta.pagination.pageCount" :total="playersData?.meta.pagination.total" class="mx-auto mt-8" />
             </div>
+          <UPagination  v-if="playersData?.meta" v-model="page" :page-count="playersData?.meta.pagination.pageCount" :total="playersData?.meta.pagination.total" class="mx-auto mt-8" />
         </section>
     </div>
 </template>
 
 <style scoped>
-a {
-    color: black;
+a,p {
     text-decoration: none;
     font-weight: bold;
 }
@@ -176,21 +191,16 @@ a {
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    height: 300px;
-    /* Définit la hauteur de la carte du joueur */
+    height: 320px;
     display: flex;
-    /* Utilisé pour aligner l'image et le contenu verticalement */
     flex-direction: column;
-    /* Empile l'image et le contenu verticalement */
 }
 
 .player-image {
     width: 100%;
     height: 200px;
-    /* Définit la hauteur de l'image */
     display: block;
     object-fit: contain;
-    /* Assure que l'image couvre bien l'espace défini sans être déformée */
 }
 
 .player-info {
@@ -207,4 +217,5 @@ a {
     font-size: 16px;
     color: #555;
 }
+
 </style>

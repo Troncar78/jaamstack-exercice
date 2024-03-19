@@ -362,83 +362,6 @@ export interface AdminTransferTokenPermission extends Schema.CollectionType {
   };
 }
 
-export interface ApiCompetitionCompetition extends Schema.CollectionType {
-  collectionName: 'competitions';
-  info: {
-    singularName: 'competition';
-    pluralName: 'competitions';
-    displayName: 'Comp\u00E9titions';
-    description: '';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    name: Attribute.String & Attribute.Required;
-    players: Attribute.Relation<
-      'api::competition.competition',
-      'manyToMany',
-      'api::player.player'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::competition.competition',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::competition.competition',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiPlayerPlayer extends Schema.CollectionType {
-  collectionName: 'players';
-  info: {
-    singularName: 'player';
-    pluralName: 'players';
-    displayName: 'Player';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    first_name: Attribute.String & Attribute.Required;
-    ranking: Attribute.Integer;
-    last_name: Attribute.String & Attribute.Required;
-    image: Attribute.Media & Attribute.Required;
-    competitions: Attribute.Relation<
-      'api::player.player',
-      'manyToMany',
-      'api::competition.competition'
-    >;
-    full_name: Attribute.String & Attribute.Private;
-    slug: Attribute.UID<'api::player.player', 'full_name'>;
-    nationalite: Attribute.String & Attribute.Required;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::player.player',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::player.player',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
 export interface PluginUploadFile extends Schema.CollectionType {
   collectionName: 'files';
   info: {
@@ -865,6 +788,123 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
   };
 }
 
+export interface ApiCompetitionCompetition extends Schema.CollectionType {
+  collectionName: 'competitions';
+  info: {
+    singularName: 'competition';
+    pluralName: 'competitions';
+    displayName: 'Comp\u00E9titions';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    name: Attribute.String & Attribute.Required;
+    players: Attribute.Relation<
+      'api::competition.competition',
+      'manyToMany',
+      'api::player.player'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::competition.competition',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::competition.competition',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiNationaliteNationalite extends Schema.CollectionType {
+  collectionName: 'nationalites';
+  info: {
+    singularName: 'nationalite';
+    pluralName: 'nationalites';
+    displayName: 'Nationalit\u00E9';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    name: Attribute.String;
+    players: Attribute.Relation<
+      'api::nationalite.nationalite',
+      'manyToMany',
+      'api::player.player'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::nationalite.nationalite',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::nationalite.nationalite',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiPlayerPlayer extends Schema.CollectionType {
+  collectionName: 'players';
+  info: {
+    singularName: 'player';
+    pluralName: 'players';
+    displayName: 'Player';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    first_name: Attribute.String & Attribute.Required;
+    ranking: Attribute.Integer;
+    last_name: Attribute.String & Attribute.Required;
+    image: Attribute.Media & Attribute.Required;
+    competitions: Attribute.Relation<
+      'api::player.player',
+      'manyToMany',
+      'api::competition.competition'
+    >;
+    full_name: Attribute.String & Attribute.Private;
+    slug: Attribute.UID<'api::player.player', 'full_name'>;
+    nationalites: Attribute.Relation<
+      'api::player.player',
+      'manyToMany',
+      'api::nationalite.nationalite'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::player.player',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::player.player',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 declare module '@strapi/types' {
   export module Shared {
     export interface ContentTypes {
@@ -875,8 +915,6 @@ declare module '@strapi/types' {
       'admin::api-token-permission': AdminApiTokenPermission;
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
-      'api::competition.competition': ApiCompetitionCompetition;
-      'api::player.player': ApiPlayerPlayer;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
       'plugin::content-releases.release': PluginContentReleasesRelease;
@@ -885,6 +923,9 @@ declare module '@strapi/types' {
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
+      'api::competition.competition': ApiCompetitionCompetition;
+      'api::nationalite.nationalite': ApiNationaliteNationalite;
+      'api::player.player': ApiPlayerPlayer;
     }
   }
 }

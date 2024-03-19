@@ -50,9 +50,11 @@
       "type": "uid",
       "targetField": "full_name"
     },
-    "nationalite": {
-      "type": "string",
-      "required": true
+    "nationalites": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::nationalite.nationalite",
+      "mappedBy": "players"
     }
   }
 }
