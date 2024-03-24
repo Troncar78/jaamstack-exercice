@@ -880,7 +880,7 @@ export interface ApiPlayerPlayer extends Schema.CollectionType {
       'manyToMany',
       'api::competition.competition'
     >;
-    full_name: Attribute.String & Attribute.Private;
+    full_name: Attribute.String;
     slug: Attribute.UID<'api::player.player', 'full_name'>;
     nationalites: Attribute.Relation<
       'api::player.player',

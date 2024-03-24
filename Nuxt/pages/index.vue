@@ -7,6 +7,7 @@ const selectedCompetition = ref('');
 const sortDirection = ref('ascending');
 const page = ref(1);
 const pageSize = ref(3);
+const playerSearchQuery = ref('');
 
 // Réinitialiser la page à 1 chaque fois que l'ordre de tri change
 watch(sortDirection, () => {
@@ -30,6 +31,9 @@ const playersQueryParams = computed(() => ({
             name: {
                 $in: selectedNationality.value !== '' ? selectedNationality.value : []
             }
+        },
+        full_name: {
+            $containsi: playerSearchQuery.value
         }
     }
     // Vous pouvez inclure l'ordre de tri dans les paramètres si votre API le supporte
@@ -39,7 +43,7 @@ const { data: playersData, pending: playersPending, error: playersError} = useAs
     'players',
     () => find('players', playersQueryParams.value),
     {
-        watch: [page, pageSize, selectedCompetition, selectedNationality, sortDirection]
+        watch: [page, pageSize, selectedCompetition, selectedNationality, sortDirection, playerSearchQuery]
     }
 );
 const { data: competitionsData, pending: competitionsPending, error: competitionsError} = useAsyncData(
@@ -57,9 +61,6 @@ const { data: nationalitesData, pending: nationalitesPending, error: nationalite
     }
 );
 
-
-
-
 // Computed property pour les joueurs filtrés et triés
 const sortedFilteredPlayers = computed(() => {
     if (!playersData.value || !playersData.value.data) {
@@ -69,16 +70,17 @@ const sortedFilteredPlayers = computed(() => {
     let players = playersData.value.data.filter((player) => {
         const matchesNationality = player.nationalites.some(nationalite => nationalite.name === selectedNationality.value) || selectedNationality.value === '';
         const matchesCompetition = player.competitions.some(competition => competition.name === selectedCompetition.value) || selectedCompetition.value === '';
-        console.log(matchesNationality)
-        return matchesNationality && matchesCompetition;
+        const matchesFullName = player.full_name.toLowerCase().includes(playerSearchQuery.value.toLowerCase()) || playerSearchQuery.value === '';
+        console.log(matchesFullName);
+        return matchesNationality && matchesCompetition && matchesFullName;
     });
 
     if (sortDirection.value === 'ascending') {
         players.sort((a, b) => a.ranking - b.ranking);
     } else if (sortDirection.value === 'descending') {
         players.sort((a, b) => b.ranking - a.ranking);
+
     }
-    // refreshPlayers()
     return players;
 });
 </script>
@@ -89,6 +91,11 @@ const sortedFilteredPlayers = computed(() => {
         <!-- <pre>{{ playersData }}</pre> -->
         <!-- <pre>{{ competitionsData }}</pre> -->
         <div class="filters  justify-center">
+          <!-- Player Name Search -->
+            <div class="filter">
+                <label for="player-search">Recherche par nom :</label>
+                <input type="text" id="player-search" v-model="playerSearchQuery" placeholder="Entrez le nom complet du joueur">
+            </div>
             <!-- Nationality Filter -->
             <div class="filter">
                 <label for="country-select">Nationalité :</label>

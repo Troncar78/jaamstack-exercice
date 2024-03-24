@@ -43,8 +43,7 @@
       "inversedBy": "players"
     },
     "full_name": {
-      "type": "string",
-      "private": true
+      "type": "string"
     },
     "slug": {
       "type": "uid",
