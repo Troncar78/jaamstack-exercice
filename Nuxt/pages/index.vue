@@ -83,6 +83,7 @@ const sortedFilteredPlayers = computed(() => {
     }
     return players;
 });
+
 </script>
 
 <template>
@@ -94,7 +95,7 @@ const sortedFilteredPlayers = computed(() => {
           <!-- Player Name Search -->
             <div class="filter">
                 <label for="player-search">Recherche par nom :</label>
-                <input type="text" id="player-search" v-model="playerSearchQuery" placeholder="Entrez le nom complet du joueur">
+                <input type="text" id="player-search" v-model="playerSearchQuery" placeholder="Nom du joueur">
             </div>
             <!-- Nationality Filter -->
             <div class="filter">
@@ -150,7 +151,7 @@ const sortedFilteredPlayers = computed(() => {
                     </div>
                 </div>
             </div>
-          <UPagination  v-if="playersData?.meta" v-model="page" :page-count="playersData?.meta.pagination.pageCount" :total="playersData?.meta.pagination.total" class="mx-auto mt-8" />
+          <UPagination  v-if="playersData?.meta" v-model="page" :page-count=pageSize :total="playersData?.meta.pagination.total" class="mx-auto mt-8" />
         </section>
     </div>
 </template>
