@@ -95,7 +95,7 @@ const sortedFilteredPlayers = computed(() => {
           <!-- Player Name Search -->
             <div class="filter">
                 <label for="player-search">Recherche par nom :</label>
-                <input type="text" id="player-search" v-model="playerSearchQuery" placeholder="Nom du joueur">
+                <input type="text" id="player-search" v-model="playerSearchQuery" placeholder="Nom du joueur" class="search">
             </div>
             <!-- Nationality Filter -->
             <div class="filter">
@@ -138,17 +138,17 @@ const sortedFilteredPlayers = computed(() => {
         <section v-else>
             <div class="player-list">
                 <div v-for="player in sortedFilteredPlayers" :key="player.id" class="player-card">
+                  <a :href="`/players/${player.slug}`">
                     <img :src="player.image.url" :alt="`Image de ${player.first_name} ${player.last_name}`"
                         class="player-image" />
                     <div class="player-info">
                         <h2 class="player-name">
-                            <a :href="`/players/${player.slug}`">
                                 {{ player.first_name }} {{ player.last_name }}
-                            </a>
                         </h2>
                         <p class="player-ranking">Classement: #{{ player.ranking }}</p>
                         <p class="player-ranking">Nationalité: {{ player.nationalites.map(nationalite => nationalite.name).join(', ') }}</p>
                     </div>
+                  </a>
                 </div>
             </div>
           <UPagination  v-if="playersData?.meta" v-model="page" :page-count=pageSize :total="playersData?.meta.pagination.total" class="mx-auto mt-8" />
@@ -224,6 +224,12 @@ a,p {
 .player-ranking {
     font-size: 16px;
     color: #555;
+}
+.search{
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 </style>

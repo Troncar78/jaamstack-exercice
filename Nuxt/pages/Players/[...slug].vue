@@ -11,6 +11,7 @@ const { data, pending, error} = await useAsyncData('player', async() => {
 </script>
 
 <template>
+  <a :href="`/`" class="underline">Back</a>
     <h1>Player single page</h1>
     <pre>{{ data }}</pre>
 </template>
